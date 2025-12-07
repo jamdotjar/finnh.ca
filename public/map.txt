@@ -1,0 +1,16 @@
+                                                                                                           
+┌───astro.config.mjs─────────────┬─────────────────┐                                                       
+├── dist        │                │                 │                                                       
+│   └── index.html               │                 │                                                       
+├───node_modules┘    ┌──┐        │                 │                                                       
+│   ├── astro -> .pnpm/astro@5.16.4_@types+node@24.10.1_rollup@4.53.3_typescript@5.9.3/node_modules/astro  
+│   └── wrangler -> .pnpm/wrangler@4.53.0/node_modules/wrangler                                            
+├── package.json                 │       │         │                                                       
+├── pnpm-lock.yaml               │       │         │                                                       
+├── public└───────────────┬──────┘       │         │                                                       
+│   └── map.txt           │              └─────────┤                                                       
+├── src ┌─┐               │      ┌──┐              │                                                       
+│   └── pages┐            │    ┌─┘  └────┐         │                                                       
+│       └───index.astro   │    │         │         │                                                       
+├── tsconfig.json         │    └─────────┘         │                                                       
+└───wrangler.jsonc────────┴────────────────────────┘                                                       
