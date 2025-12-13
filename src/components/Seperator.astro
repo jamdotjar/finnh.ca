@@ -1,0 +1,45 @@
+---
+const {
+  value = 50,          // percent
+  scale = 8,         // pixel scale factor (8px on screen = 1px in  img)
+  color = 'rgba(39, 39, 42, 0.1)',     // color   
+} = Astro.props;
+
+let bayer_level = Math.floor((value / 100) * 16);
+
+const images = [
+  '/bayer/bayer4-level-00.png',
+  '/bayer/bayer4-level-01.png',
+  '/bayer/bayer4-level-02.png',
+  '/bayer/bayer4-level-03.png',
+  '/bayer/bayer4-level-04.png',
+  '/bayer/bayer4-level-05.png',
+  '/bayer/bayer4-level-06.png',
+  '/bayer/bayer4-level-07.png',
+  '/bayer/bayer4-level-08.png',
+  '/bayer/bayer4-level-09.png',
+  '/bayer/bayer4-level-10.png',
+  '/bayer/bayer4-level-11.png',
+  '/bayer/bayer4-level-12.png',
+  '/bayer/bayer4-level-13.png',
+  '/bayer/bayer4-level-14.png',
+  '/bayer/bayer4-level-15.png',
+  '/bayer/bayer4-level-16.png',
+];
+
+const image = images[bayer_level];
+---
+<div class="seperator" style={`background-color: ${color}; -webkit-mask-image: url(${image}); -webkit-mask-size: ${scale}px ${scale}px; mask-image: url(${image}); mask-size: ${scale}px ${scale}px;`}> </div>
+<style>
+.seperator {
+    height: 75px;
+    width: 100%;
+    margin: 0;
+    -webkit-mask-repeat: repeat;
+    mask-repeat: repeat;
+    mask-position: 0 0;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+</style>

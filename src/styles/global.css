@@ -1,0 +1,53 @@
+/* Barebones globals based on the wireframe palette/typography */
+:root {
+	--color-bg: #fdfdfd;
+	--color-surface: #ffffff;
+	--color-text: #27272a;
+	--color-text-muted: rgba(39, 39, 42, 0.7);
+	--color-border: rgba(39, 39, 42, 0.1);
+
+	--font-sans: "Switzer", "Manrope", system-ui, -apple-system, sans-serif;
+	--font-title: "Switzer", system-ui, -apple-system, sans-serif;
+	--font-mono: "IBM Plex Mono", monospace;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--color-bg);
+	color: var(--color-text);
+	font-family: var(--font-sans);
+	line-height: 1.5;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+	color: var(--color-text);
+	font-family: var(--font-title);
+}
+
+h1 {
+    font-weight: 300;
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+}
+
+p {
+	margin: 0;
+	color: var(--color-text);
+}
+
+a {
+	color: inherit;
+	text-decoration-color: var(--color-text-muted);
+}

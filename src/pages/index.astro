@@ -2,16 +2,98 @@
 // Welcome to Astro! Everything between these triple-dash code fences
 // is your "component frontmatter". It never runs in the browser.
 console.log('This runs in your terminal, not the browser!');
+import { Image } from 'astro:assets';
+import '../styles/global.css';
+
+import Seperator from '../components/Seperator.astro';
 ---
 <!-- Below is your "component template." It's just HTML, but with
     some magic sprinkled in to help you build great templates. -->
 <html>
   <body>
-    <h1>Hello, World!</h1>
+    <header class="menubar"> <a href="/">finnh.ca</a> <nav style="display: flex; justify-content: right; gap: 50px;"><a>Projects</a> <a>writing</a></nav> </header>
+    <main>
+    <section class="hero block">
+      <div class="hero-text">
+      <h1>Hey, it's Finn</h1>
+      <p>I'm an organically grown massive fucking nerd from Canada. I make thing for fun, fortune, and financial ruin. Check out some of by projects below, read my ramblings, and if you want get in touch!</p>
+      </div>
+      <div class="hero-media">
+      <Image class="hero-img" src={import('../assets/hero.jpg')} alt="AAAAAA"/></div>
+    </section>
+    <Seperator value="15"/>
+    <section class="projects block">
+      <div>
+        <ul> 
+          <li>
+          <article>
+            <h2>Project One</h2>
+            <p>This is a description of project one. It's really cool and you should check it out!</p>
+          </article>
+          </li>
+        </ul>
+      </div>
+      <aside>
+        <h2>Projects</h2>
+        <p>Here's what I've worked on recently, maybe some of it is interesting?</p>
+      </aside>
+    </main>
   </body>
 </html>
 <style>
-  h1 {
-    color: orange;
-  }
+main {
+}
+
+section.block {
+  margin: 0 75px;
+}
+
+.menubar {
+  position: sticky;
+  display: flex;
+  height: 75px;
+  padding: 25px 75px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  backdrop-filter: blur(10px);
+}
+
+.hero {
+  display: flex; 
+  padding: 50px;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 150px;
+  font-size: 1.5rem;
+  border: 1px solid var(--color-border);
+  margin: 0;
+}
+
+.hero > * { flex: 1; }
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+  min-height: 350px;
+}
+
+.hero-media {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 </style>

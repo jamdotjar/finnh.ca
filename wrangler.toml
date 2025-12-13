@@ -1,0 +1,7 @@
+name = "finnh-ca"
+compatibility_date = "2025-12-06"
+assets = { directory = "./dist" }
+
+[[routes]]
+pattern = "finnh.ca"
+custom_domain = true
