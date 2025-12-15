@@ -6,37 +6,47 @@ import { Image } from 'astro:assets';
 import '../styles/global.css';
 
 import Seperator from '../components/Seperator.astro';
+import Head from '../components/Head.astro';
 ---
 <!-- Below is your "component template." It's just HTML, but with
     some magic sprinkled in to help you build great templates. -->
 <html>
+      <Head/>
   <body>
-    <header class="menubar"> <a href="/">finnh.ca</a> <nav style="display: flex; justify-content: right; gap: 50px;"><a>Projects</a> <a>writing</a></nav> </header>
+    <header class="menubar"> <a href="/" style="text-decoration: none;">finnh.ca</a> <nav style="display: flex; justify-content: right; gap: 50px;"><a>Projects</a> <a>writing</a></nav> </header>
     <main>
     <section class="hero block">
       <div class="hero-text">
-      <h1>Hey, it's Finn</h1>
-      <p>I'm an organically grown massive fucking nerd from Canada. I make thing for fun, fortune, and financial ruin. Check out some of by projects below, read my ramblings, and if you want get in touch!</p>
+      <h1><i>Hey, it's Finn</i></h1>
+      <p>I'm an organically grown massive ▓▓▓▓ nerd from Canada. I make thing for fun, fortune, and financial ruin. Check out some of by projects below, read my ramblings, and if you want get in touch!</p>
       </div>
-      <div class="hero-media">
-      <Image class="hero-img" src={import('../assets/hero.jpg')} alt="AAAAAA"/></div>
+      <div class="hero-media"><Image class="hero-img" src={import('../assets/hero-dith.png')} alt="AAAAAA"/></div>
     </section>
-    <Seperator value="15"/>
+    <Seperator value="13"/>
     <section class="projects block">
-      <div>
-        <ul> 
+        <ul class="project-grid"> 
           <li>
           <article>
-            <h2>Project One</h2>
+            <Image src={import('../assets/project-card.png')} alt="Project One" width={400}/>
+            <h2><p>Project One</p><p>Jul 2025</p></h2> 
+            <p>This is a description of project one. It's really cool and you should check it out!</p>
+          </article>
+          </li>
+          <li>
+          <article>
+            <Image src={import('../assets/project-card.png')} alt="Project One" width={400}/>
+            <h2><p>Project One</p><p>Jul 2025</p></h2> 
             <p>This is a description of project one. It's really cool and you should check it out!</p>
           </article>
           </li>
         </ul>
-      </div>
       <aside>
         <h2>Projects</h2>
         <p>Here's what I've worked on recently, maybe some of it is interesting?</p>
       </aside>
+    </section>
+    <Seperator value="27"/>
+    
     </main>
   </body>
 </html>
@@ -46,6 +56,107 @@ main {
 
 section.block {
   margin: 0 75px;
+
+}
+
+.projects {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+}
+
+.projects aside{ 
+  border: 1px solid var(--color-border);
+  border-left: none;
+  display: flex;
+  padding: 50px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 50px;
+  align-self: stretch;
+} h2 {
+  font-size: 2rem;
+}
+
+.project-grid {
+  max-height: 1025px;
+  padding: 50px;
+  border: 1px solid var(--color-border);
+  list-style: none;
+  margin: 0;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 50px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.project-grid ul {
+
+}
+
+.project-grid article {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  width: 400px;
+  display: flex;
+
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.project-grid article p {
+  padding: 0 10px;
+
+}
+.project-grid article h2 {
+  font-weight: 300;
+  display: flex;
+justify-content: space-between;
+align-items: center;
+align-self: stretch;
+font-size: 1rem;
+}
+
+.hero {
+  display: flex; 
+  padding: 50px;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: auto;
+  border: 1px solid var(--color-border);
+  margin: 0;
+}
+
+.hero > * { flex: 1; }
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 250px;
+  font-size: 1.25rem;
+}
+
+.hero-media {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  height: 250px;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+  transition: transform 0.3s ease-in-out;
+  margin: auto;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .menubar {
@@ -59,41 +170,6 @@ section.block {
   border-bottom: 1px solid var(--color-border);
   background-color: var(--color-surface);
   backdrop-filter: blur(10px);
-}
-
-.hero {
-  display: flex; 
-  padding: 50px;
-  justify-content: space-between;
-  align-items: stretch;
-  gap: 150px;
-  font-size: 1.5rem;
-  border: 1px solid var(--color-border);
-  margin: 0;
-}
-
-.hero > * { flex: 1; }
-
-.hero-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 25px;
-  min-height: 350px;
-}
-
-.hero-media {
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
 
 </style>
