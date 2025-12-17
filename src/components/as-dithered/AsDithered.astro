@@ -1,0 +1,416 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  crunch?: 'auto' | 'pixel' | number;
+  cutoff?: number;
+  darkrgba?: string;
+  lightrgba?: string;
+}
+
+const { 
+  src, 
+  alt, 
+  crunch = 'auto', 
+  cutoff = 0.5, 
+  darkrgba = 'rgba(0, 0, 0, 255)', 
+  lightrgba = 'rgba(255, 255, 255, 255)' 
+} = Astro.props;
+---
+
+<as-dithered-image
+  src={src}
+  alt={alt}
+  crunch={crunch.toString()}
+  cutoff={cutoff.toString()}
+  darkrgba={darkrgba}
+  lightrgba={lightrgba}
+>
+</as-dithered-image>
+
+<script>
+  const DITHERED_IMAGE_STYLE = `
+  .ditheredImageStyle {
+      display: block;
+      width: 100%;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      image-rendering: crisp-edges;
+  }
+  `;
+
+  // Inline worker code to avoid path resolution issues in Astro
+  const workerCode = `
+    onmessage = function (e) {
+      const result = dither(e.data.imageData, e.data.pixelSize, e.data.cutoff, e.data.blackRGBA, e.data.whiteRGBA)
+      const reply = {}
+      reply.imageData = result
+      reply.pixelSize = e.data.pixelSize
+      reply.cutoff = e.data.cutoff
+      postMessage(reply)
+    }
+
+    function getRGBAArrayBuffer(color) {
+      let buffer = new ArrayBuffer(4)
+      for (let i = 0; i < 4; ++i) {
+        buffer[i] = color[i]
+      }
+      return buffer
+    }
+
+    function dither(imageData, scaleFactor, cutoff, blackRGBA, whiteRGBA) {
+      const blackRGBABuffer = getRGBAArrayBuffer(blackRGBA)
+      const whiteRGBABuffer = getRGBAArrayBuffer(whiteRGBA)
+      let output = new ImageData(imageData.width * scaleFactor, imageData.height * scaleFactor)
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        imageData.data[i] = imageData.data[i + 1] = imageData.data[i + 2] = Math.floor(imageData.data[i] * 0.3 + imageData.data[i + 1] * 0.59 + imageData.data[i + 2] * 0.11)
+      }
+
+      let slidingErrorWindow = [new Float32Array(imageData.width), new Float32Array(imageData.width), new Float32Array(imageData.width)]
+      const offsets = [[1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]]
+
+      for (let y = 0, limY = imageData.height; y < limY; ++y) {
+        for (let x = 0, limX = imageData.width; x < limX; ++x) {
+          let i = ((y * limX) + x) * 4;
+          let accumulatedError = Math.floor(slidingErrorWindow[0][x])
+          let expectedMono = imageData.data[i] + accumulatedError
+          let monoValue = expectedMono
+          if (monoValue <= Math.floor(cutoff * 255)) {
+            monoValue = 0
+          } else {
+            monoValue = 255
+          }
+          let error = (expectedMono - monoValue) / 8.0
+          for (let q = 0; q < offsets.length; ++q) {
+            let offsetX = offsets[q][0] + x
+            let offsetY = offsets[q][1] + y
+            if ((offsetX >= 0) && (offsetX < slidingErrorWindow[0].length))
+              slidingErrorWindow[offsets[q][1]][offsetX] += error
+          }
+
+          let rgba = (monoValue == 0) ? blackRGBABuffer : whiteRGBABuffer
+
+          for (let scaleY = 0; scaleY < scaleFactor; ++scaleY) {
+            let pixelOffset = (((y * scaleFactor + scaleY) * output.width) + (x * scaleFactor)) * 4
+            for (let scaleX = 0; scaleX < scaleFactor; ++scaleX) {
+              output.data[pixelOffset] = rgba[0]
+              output.data[pixelOffset + 1] = rgba[1]
+              output.data[pixelOffset + 2] = rgba[2]
+              output.data[pixelOffset + 3] = rgba[3]
+              pixelOffset += 4
+            }
+          }
+        }
+        slidingErrorWindow.push(slidingErrorWindow.shift())
+        slidingErrorWindow[2].fill(0, 0, slidingErrorWindow[2].length)
+      }
+      return output
+    }
+  `;
+
+  class ASDitheredImage extends HTMLElement {
+    private original_image_?: HTMLImageElement;
+    private force_refresh_: boolean = false;
+    private crunchFactor_: number;
+    private canvas_?: HTMLCanvasElement;
+    private context_?: CanvasRenderingContext2D;
+    private image_loading_: boolean = false;
+    private ignore_next_resize_: boolean = false;
+    private worker_: Worker;
+    private cutoff_: number = 0.5;
+    private darkrgba_: number[] = [0, 0, 0, 255];
+    private lightrgba_: number[] = [255, 255, 255, 255];
+    private resizing_timeout_?: number;
+    private last_draw_state_: {
+      width: number;
+      height: number;
+      adjustedPixelSize?: number;
+      imageSrc: string;
+      cutoff?: number;
+      darkrgba?: number[];
+      lightrgba?: number[];
+    } = { width: 0, height: 0, imageSrc: "" };
+
+    constructor() {
+      super();
+
+      this.crunchFactor_ = this.getAutoCrunchFactor();
+      
+      // Create worker from inline code
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      const workerUrl = URL.createObjectURL(blob);
+      this.worker_ = new Worker(workerUrl);
+
+      this.worker_.onmessage = ((e: MessageEvent) => {
+        const imageData = e.data.imageData;
+        this.context_?.putImageData(imageData, 0, 0);
+      }).bind(this);
+    }
+
+    connectedCallback() {
+      if (!this.isConnected) {
+        return;
+      }
+
+      const shadowDOM = this.attachShadow({ mode: "open" });
+
+      const style = document.createElement("style");
+      style.innerHTML = DITHERED_IMAGE_STYLE;
+      shadowDOM.appendChild(style);
+
+      this.canvas_ = document.createElement("canvas");
+      this.canvas_.setAttribute("role", "image");
+      this.canvas_.setAttribute("aria-label", this.getAttribute("alt") || "");
+      this.canvas_.classList.add("ditheredImageStyle");
+      shadowDOM.appendChild(this.canvas_);
+
+      this.context_ = this.canvas_.getContext("2d", { willReadFrequently: true }) || undefined;
+
+      const resizeObserver = new ResizeObserver(((entries: ResizeObserverEntry[]) => {
+        if (entries.length > 0) {
+          if (entries[0].contentBoxSize) {
+            if (this.ignore_next_resize_ === true) {
+              this.ignore_next_resize_ = false;
+              return;
+            }
+            if (this.resizing_timeout_ !== undefined) {
+              clearTimeout(this.resizing_timeout_);
+            }
+            this.resizing_timeout_ = window.setTimeout((() => {
+              this.resizing_timeout_ = undefined;
+              this.force_refresh_ = true;
+              this.requestUpdate();
+            }).bind(this), 200);
+          }
+        }
+      }).bind(this));
+
+      resizeObserver.observe(this.canvas_);
+
+      const intersectionObserver = new IntersectionObserver(((intersections: IntersectionObserverEntry[]) => {
+        if (intersections.length > 0) {
+          if (intersections[0].isIntersecting) {
+            this.force_refresh_ = true;
+            this.requestUpdate();
+          }
+        }
+      }).bind(this), { root: null, rootMargin: "1000px", threshold: [0] });
+      
+      intersectionObserver.observe(this);
+
+      this.force_refresh_ = true;
+      this.requestUpdate();
+    }
+
+    static get observedAttributes() {
+      return ["src", "crunch", "alt", "cutoff", "darkrgba", "lightrgba"];
+    }
+
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
+      if (oldValue === newValue) return;
+
+      if (name === "src") {
+        this.force_refresh_ = true;
+        this.original_image_ = undefined;
+        this.requestUpdate();
+      } else if (name === "crunch") {
+        if (newValue === "auto") {
+          this.crunchFactor_ = this.getAutoCrunchFactor();
+        } else if (newValue === "pixel") {
+          this.crunchFactor_ = 1.0 / this.getDevicePixelRatio();
+        } else {
+          this.crunchFactor_ = parseInt(newValue || "1", 10);
+          if (isNaN(this.crunchFactor_)) {
+            this.crunchFactor_ = this.getAutoCrunchFactor();
+          }
+        }
+        this.force_refresh_ = true;
+        this.requestUpdate();
+      } else if (name === "alt") {
+        if (this.canvas_) {
+          const currentAltText = this.canvas_.getAttribute("aria-label");
+          if (currentAltText !== newValue) {
+            this.canvas_.setAttribute("aria-label", newValue || "");
+          }
+        }
+      } else if (name === "cutoff") {
+        this.cutoff_ = parseFloat(newValue || "0.5");
+        if (isNaN(this.cutoff_)) {
+          this.cutoff_ = 0.5;
+        }
+        this.cutoff_ = Math.min(1.0, Math.max(0.0, this.cutoff_));
+        this.force_refresh_ = true;
+        this.requestUpdate();
+      } else if (name === "darkrgba") {
+        this.darkrgba_ = this.parseRGBA(newValue || "rgba(0, 0, 0, 255)");
+        this.force_refresh_ = true;
+        this.requestUpdate();
+      } else if (name === "lightrgba") {
+        this.lightrgba_ = this.parseRGBA(newValue || "rgba(255, 255, 255, 255)");
+        this.force_refresh_ = true;
+        this.requestUpdate();
+      }
+    }
+
+    getAutoCrunchFactor(): number {
+      if (this.getDevicePixelRatio() < 3) {
+        return 1;
+      } else {
+        return 2;
+      }
+    }
+
+    getDevicePixelRatio(): number {
+      return window.devicePixelRatio;
+    }
+
+    isInOrNearViewport(): boolean {
+      const margin = 1500;
+      const r = this.getBoundingClientRect();
+      const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+      const above = r.bottom + margin < 0;
+      const below = r.top - margin > viewHeight;
+      return !above && !below;
+    }
+
+    requestUpdate() {
+      if (this.original_image_ !== undefined) {
+        if (this.isInOrNearViewport() === false) {
+          return;
+        }
+      }
+
+      window.requestAnimationFrame(((timestamp: number) => {
+        if (this.force_refresh_ === false) {
+          return;
+        }
+        if (this.original_image_ === undefined) {
+          this.loadImage();
+          return;
+        }
+        if (this.force_refresh_) {
+          this.repaintImage();
+        }
+      }).bind(this));
+    }
+
+    loadImage() {
+      if (this.image_loading_ === true) {
+        return;
+      }
+      this.image_loading_ = true;
+      const image = new Image();
+      image.src = this.getAttribute("src") || "";
+
+      image.decode()
+        .then((() => {
+          this.original_image_ = image;
+          this.ignore_next_resize_ = true;
+          if (this.canvas_) {
+            this.canvas_.style.aspectRatio = this.original_image_.width + "/" + this.original_image_.height;
+          }
+          this.force_refresh_ = true;
+          this.requestUpdate();
+        }).bind(this))
+        .catch(((decodeError: Error) => {
+          console.log("Error decoding image: ", decodeError);
+          this.original_image_ = undefined;
+        }).bind(this))
+        .finally((() => {
+          this.image_loading_ = false;
+        }).bind(this));
+    }
+
+    parseRGBA(s: string): number[] {
+      const matches = s.match(/^rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+      if (matches) {
+        return [parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), parseInt(matches[4])];
+      } else {
+        return [255, 255, 255, 255];
+      }
+    }
+
+    repaintImage() {
+      if (!this.canvas_ || !this.context_ || !this.original_image_) {
+        return;
+      }
+
+      const rect = this.canvas_.getBoundingClientRect();
+      let screenPixelsToBackingStorePixels = this.getDevicePixelRatio();
+      let fractionalPart = screenPixelsToBackingStorePixels - Math.floor(screenPixelsToBackingStorePixels);
+
+      if (this.getAttribute("crunch") === "pixel") {
+        this.crunchFactor_ = 1.0 / this.getDevicePixelRatio();
+      }
+
+      if (1.0 / fractionalPart > 3) {
+        fractionalPart = 0;
+        screenPixelsToBackingStorePixels = Math.round(screenPixelsToBackingStorePixels);
+      }
+      if (fractionalPart !== 0) {
+        screenPixelsToBackingStorePixels = Math.round(screenPixelsToBackingStorePixels * Math.round(1.0 / fractionalPart));
+      }
+
+      const calculatedWidth = Math.round(rect.width * screenPixelsToBackingStorePixels);
+      const calculatedHeight = Math.round(rect.height * screenPixelsToBackingStorePixels);
+      const adjustedPixelSize = Math.round(screenPixelsToBackingStorePixels * this.crunchFactor_);
+
+      if (
+        this.last_draw_state_.width === calculatedWidth &&
+        this.last_draw_state_.height === calculatedHeight &&
+        this.last_draw_state_.adjustedPixelSize === adjustedPixelSize &&
+        this.last_draw_state_.imageSrc === this.original_image_.currentSrc &&
+        this.last_draw_state_.cutoff === this.cutoff_ &&
+        JSON.stringify(this.last_draw_state_.darkrgba) === JSON.stringify(this.darkrgba_) &&
+        JSON.stringify(this.last_draw_state_.lightrgba) === JSON.stringify(this.lightrgba_)
+      ) {
+        return;
+      }
+
+      this.canvas_.width = calculatedWidth;
+      this.canvas_.height = calculatedHeight;
+
+      this.last_draw_state_.width = this.canvas_.width;
+      this.last_draw_state_.height = this.canvas_.height;
+      this.last_draw_state_.adjustedPixelSize = adjustedPixelSize;
+      this.last_draw_state_.imageSrc = this.original_image_.currentSrc;
+      this.last_draw_state_.cutoff = this.cutoff_;
+      this.last_draw_state_.darkrgba = this.darkrgba_;
+      this.last_draw_state_.lightrgba = this.lightrgba_;
+
+      this.context_.imageSmoothingEnabled = true;
+      this.context_.drawImage(
+        this.original_image_,
+        0,
+        0,
+        this.canvas_.width / adjustedPixelSize,
+        this.canvas_.height / adjustedPixelSize
+      );
+      
+      const originalData = this.context_.getImageData(
+        0,
+        0,
+        this.canvas_.width / adjustedPixelSize,
+        this.canvas_.height / adjustedPixelSize
+      );
+      
+      this.context_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
+
+      const msg = {
+        imageData: originalData,
+        pixelSize: adjustedPixelSize,
+        cutoff: this.cutoff_,
+        blackRGBA: this.darkrgba_,
+        whiteRGBA: this.lightrgba_
+      };
+      
+      this.worker_.postMessage(msg);
+      this.force_refresh_ = false;
+    }
+  }
+
+  if (!customElements.get('as-dithered-image')) {
+    customElements.define('as-dithered-image', ASDitheredImage);
+  }
+</script>

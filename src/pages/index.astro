@@ -7,9 +7,9 @@ import '../styles/global.css';
 
 import Seperator from '../components/Seperator.astro';
 import Head from '../components/Head.astro';
+import AsDithered from '../components/as-dithered/AsDithered.astro';
+import projectCard from '../assets/project-card.png';
 ---
-<!-- Below is your "component template." It's just HTML, but with
-    some magic sprinkled in to help you build great templates. -->
 <html>
       <Head/>
   <body>
@@ -24,29 +24,66 @@ import Head from '../components/Head.astro';
     </section>
     <Seperator value="13"/>
     <section class="projects block">
+      <aside>
+        <h2>Projects</h2>
+        <p>Here's what I've worked on recently, maybe some of it is interesting?</p>
+      </aside>
         <ul class="project-grid"> 
           <li>
           <article>
-            <Image src={import('../assets/project-card.png')} alt="Project One" width={400}/>
+            <div class="dithimg">
+              
+              <Image src={projectCard} alt="Project One" width={400}/>
+              <AsDithered src={projectCard.src} alt="Project One"/>
+            </div>
+            
             <h2><p>Project One</p><p>Jul 2025</p></h2> 
             <p>This is a description of project one. It's really cool and you should check it out!</p>
           </article>
           </li>
           <li>
           <article>
-            <Image src={import('../assets/project-card.png')} alt="Project One" width={400}/>
+            <div class="dithimg">
+            <Image src={projectCard} alt="Project One" width={400}/>
+            <AsDithered src={projectCard.src} alt="Project One"/>
+            </div>
             <h2><p>Project One</p><p>Jul 2025</p></h2> 
             <p>This is a description of project one. It's really cool and you should check it out!</p>
           </article>
           </li>
         </ul>
-      <aside>
-        <h2>Projects</h2>
-        <p>Here's what I've worked on recently, maybe some of it is interesting?</p>
-      </aside>
+      
     </section>
     <Seperator value="27"/>
-    
+    <section class="writing block">
+      <div class = "section-header">
+        <h2>Writing</h2>
+        <p>thoughts on life, the universe, and nothing at all</p>
+      </div>
+      <div class="post-list">
+        <div class="post-info"> 
+            <a class="post-title">Title</a> <p class="post-blurb">"Bllurbbbbbbbbabsbadsd tjhiasBllurbbbbbbbbabsbadsd tjhiasBllurbbbbbbbbabsbadsd tjhiasBllurbbbbbbbbabsbadsd tjhias"</p> <p class="post-date">2009 12 21</p> <div class="post-tags"><a>tag</a></div>
+        </div>
+      </div>
+    </section>
+    <Seperator value="35"/>
+    <div class="block" style="display: flex; gap: 50px;">
+      <section class="contact" style="flex: 1;">
+      <div class="section-header" style="justify-content: flex-end; gap: 10px"><p>Want to yell at me? here' how to get in</p><h2>Contact</h2></div>
+      <div class="contact-links">
+        <a href="mailto:hi@finnh.ca">[saying hi]</a>
+        <a href="mailto:work@finnh.ca">[second email]</a>
+        <a href="https://github.com/jamdotjar">[github]</a>
+        <a href="https://hackclub.enterprise.slack.com/team/U066HP9DWPK">[slack]</a>
+      </div>
+      </section>
+      <section class="lucky" style="flex: 1;">
+  
+      </section>
+    </div>
+    <footer class="footer"> 
+      <p>© Finn Hofbauer, 2025</p> <a>commit e754ba, github</a>
+    </footer>
     </main>
   </body>
 </html>
@@ -56,11 +93,121 @@ main {
 
 section.block {
   margin: 0 75px;
+}
+.footer {
+  position: relative;
+  display: flex;
+  padding: 25px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  background-color: var(--color-text);
+  color: var(--color-bg);
+}
 
+
+.lucky {
+  width: 100%;
+}
+.contact-links {
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  align-content: center;
+  gap: 13px 46px;
+  align-self: stretch;
+  flex-wrap: wrap;
+}
+.contact {
+  display: flex;
+  padding: 50px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 50px;
+  border: 1px solid var(--color-border);
+}
+
+.writing {
+  display: flex;
+  border: 1px solid var(--color-border);
+  padding: 50px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 50px;
+  align-self: stretch;
+  min-height: 300px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  align-self: stretch;
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 15px;
+  width: 100%;
+}
+.post-info {
+  display: flex;
+  gap: 50px;
+  align-items: baseline;
+  width: 100%;
+  max-width: 800px;
+  font-size: 1rem;
+}
+.post-title {
+  color: var(--color-text);
+  font-family: var(--font-title, sans-serif);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+.post-blurb {
+  font-family: var(--font-title, sans-serif);
+  font-style: italic;
+  font-weight: 200;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50ch;
+}
+
+.post-date {
+  color: rgba(39, 39, 42, 0.5);
+  font-family: var(--font-mono, monospace);
+}
+
+.post-tags a {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono, monospace);
+  font-style: normal;
+  font-weight: 300;
+  line-height: normal;
+}
+
+.writing-row-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 200px;
+}
+.writing-tag {
+  text-decoration: underline;
+  text-underline-position: from-font;
+  margin-right: 0.25em;
 }
 
 .projects {
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
   align-self: stretch;
 }
@@ -74,6 +221,7 @@ section.block {
   align-items: flex-start;
   gap: 50px;
   align-self: stretch;
+  width: 300px;
 } h2 {
   font-size: 2rem;
 }
@@ -84,24 +232,42 @@ section.block {
   border: 1px solid var(--color-border);
   list-style: none;
   margin: 0;
-  display: flex;
-  flex: 0 0 auto;
-  gap: 50px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
+
+  row-gap: 50px;
+  column-gap: 50px;
+  width: 100%;
+  
+  display: grid;
+  flex: 0 1 auto;
+
+  align-items: center;
+  justify-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 400px));
+    justify-content: center;
+  align-self: stretch;
 }
 
-.project-grid ul {
-
+@media (max-width: 900px) {
+  .projects {
+    flex-direction: column;
+  }
+  .projects aside {
+    border-left: 1px solid var(--color-border);
+    border-bottom: none;
+    width: 100%;
+    padding: 30px 20px;
+    box-sizing: border-box;
+    flex-direction: row;
+    align-items: baseline;
+  }
 }
 
 .project-grid article {
+    box-sizing: border-box;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   width: 400px;
   display: flex;
-
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
@@ -121,6 +287,30 @@ align-self: stretch;
 font-size: 1rem;
 }
 
+.dithimg {
+  position: relative;
+  width: 400px;
+}
+
+/* Base image establishes intrinsic height */
+.dithimg img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Overlay the dithered version exactly on top */
+.dithimg > :global(as-dithered-image) {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: opacity 0.3s;
+}
+
+.dithimg > :global(as-dithered-image):hover {
+  opacity: 0;
+}
+
 .hero {
   display: flex; 
   padding: 50px;
@@ -128,6 +318,7 @@ font-size: 1rem;
   align-items: stretch;
   gap: auto;
   border: 1px solid var(--color-border);
+  border-top: none;
   margin: 0;
 }
 
@@ -171,5 +362,6 @@ font-size: 1rem;
   background-color: var(--color-surface);
   backdrop-filter: blur(10px);
 }
+
 
 </style>

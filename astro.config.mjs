@@ -12,7 +12,7 @@ export default defineConfig({
                 name: "Switzer",
                 cssVariable: "--font-switzer",
                 provider: fontProviders.fontshare(),
-                weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+                weights: [100, 200, 300, 400, 500, 600, 700, 800],
             },
             {
                 name: "Manrope",
