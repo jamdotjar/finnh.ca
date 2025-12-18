@@ -8,18 +8,27 @@ import '../styles/global.css';
 import Seperator from '../components/Seperator.astro';
 import Head from '../components/Head.astro';
 import AsDithered from '../components/as-dithered/AsDithered.astro';
-import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 
 import ultraterm from '../assets/projects/ultraterm.png';
 import jam56s from '../assets/projects/jam56s.png';
 import rtwtui from '../assets/projects/rtwtui.png';
 import splotch from '../assets/projects/splotch.png';
 import beatbot from '../assets/projects/beatbot.png';
+import Layout from '../layouts/Layout.astro';
 
 import { getCollection } from 'astro:content';
 
 
 import { date } from 'astro:schema';
+
+import { execSync } from 'node:child_process';
+
+let commitHash = 'unknown';
+try {
+  commitHash = execSync('git rev-parse HEAD').toString().trim().slice(0, 6);
+} catch (e) {
+  console.warn('Could not get git commit hash');
+}
 
 const projects = [
   {
@@ -67,10 +76,11 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
 
 
 ---
+<Layout title="finnh.ca" description="My corner of the internet that `I rent for  $13.47/year ">
 <html>
       <Head/>
   <body>
-    <header class="menubar"> <a href="/" style="text-decoration: none;">finnh.ca</a> <nav style="display: flex; justify-content: right; gap: 50px;"><a href="#projects"><i class="hn hn-folder-solid"></i>Projects</a> <a href="#writing"><i class="hn hn-writing"></i>Writing</a></nav> </header>
+    <header class="menubar"> <a href="/" class="wave-text">finnh.ca</a> <nav style="display: flex; justify-content: right; gap: 50px;"><a href="#projects"><i class="hn hn-folder-solid"></i>Projects</a> <a href="#writing"><i class="hn hn-writing"></i>Writing</a></nav> </header>
     <main>
     <section class="hero block">
       <div class="hero-text">
@@ -115,7 +125,7 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
         </ul>
       
     </section>
-    <Seperator value="27"/>
+    <Seperator value="35"/>
     <section class="writing block" id="writing">
       <div class = "section-header">
         <h2 >Writing</h2>
@@ -134,10 +144,10 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
       ))}
       </div>
     </section>
-    <Seperator value="35"/>
-    <div class="block" style="display: flex; align-self: stretch; gap: 50px; border: 1px solid var(--color-border); margin: 0 75px;">
+    <Seperator value="45"/>
+    <div class="block" style="display: flex; align-self: stretch; border: 1px solid var(--color-border); margin: 0 75px;">
       <section class="contact">
-      <div class="section-header" style="justify-content: flex-end; gap: 10px"><p>Want to yell at me? here' how to get in</p><h2>Contact</h2></div>
+      <div class="section-header" style="justify-content: flex-end; gap: 10px"><p>Want to yell at me? Here's how to get in</p><h2>Contact</h2></div>
       <div class="contact-links">
       <a href="mailto:hi@finnh.ca">[saying hi]</a>
       <a href="mailto:work@finnh.ca">[second email]</a>
@@ -146,15 +156,25 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
       </div>
       </section>
       <section class="lucky">
-      Under construction?
+      under construction...
       </section>
     </div>
     <footer class="footer"> 
-      <p>© Finn Hofbauer, 2025</p> <a href="https://github.com/jamdotjar/finnh.ca">commit e754ba, github</a>
+      <p>© Finn Hofbauer, 2025</p> <a href="https://github.com/jamdotjar/finnh.ca">commit {commitHash}, github</a>
     </footer>
     </main>
   </body>
 </html>
+
+<script>
+  document.querySelectorAll('.wave-text').forEach(el => {
+    const text = el.textContent;
+    el.innerHTML = text.split('').map((char, i) => 
+      `<span style="--char-index: ${i}">${char}</span>`
+    ).join('');
+  });
+</script>
+
 <style>
 main {
   scroll-timeline: --main-timeline;
@@ -189,6 +209,7 @@ section.block {
   flex: 1;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-mono);
 }
 .contact-links {
   font-family: var(--font-mono);
@@ -322,6 +343,11 @@ section.block {
   gap: 50px;
   align-self: stretch;
   width: 300px;
+  background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('/grad-dith.png'); 
+  background-size: 400%;
+  background-position: 20% 50%;
+  background-repeat: repeat-x;
+  background-color: transparent;
 } h2 {
   font-size: 2rem;
 }
@@ -502,6 +528,14 @@ background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)
   left: 50%;
   transform: translateX(-50%);
 }
+.hero-media:hover .hero-img {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.hero-media:active .hero-img {
+  transform: translateX(-50%) scale(1.02);
+}
+
 
 .menubar {
   position: sticky;
@@ -541,5 +575,33 @@ background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)
   
 }
 
+
+.wave-text {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+:global(.wave-text span) {
+  display: inline-block;
+  font-weight: 400;
+  transition: font-weight 0.1s ease;
+}
+.wave-text:hover {
+  cursor: pointer;
+}
+
+:global(.wave-text:hover span) {
+  animation: fontWave 2s ease-in-out infinite;
+  animation-delay: calc(var(--char-index) * 0.08s);
+}
+
+@keyframes fontWave {
+  0%, 50% {
+    font-weight: 400;
+  }
+  25% {
+    font-weight: 700;
+  }
+}
 
 </style>

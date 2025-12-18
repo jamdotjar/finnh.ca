@@ -96,6 +96,7 @@ p {
 a {
 	color: inherit;
 	text-decoration-color: var(--color-text-muted);
+	text-decoration: inherit;
 }
 
 img {
