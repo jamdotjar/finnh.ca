@@ -22,7 +22,7 @@ export default defineConfig({
 
             },
             {
-                name: "Ibm Plex Mono",
+                name: "IBM Plex Mono",
                 cssVariable: "--font-ibmplexmono",
                 provider: fontProviders.google(),
             }

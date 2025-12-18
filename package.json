@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hackernoon/pixel-icon-library": "^1.0.6",
     "astro": "^5.16.4"
   },
   "devDependencies": {

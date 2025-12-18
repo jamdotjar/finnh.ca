@@ -2,6 +2,8 @@
 title: "Making This"
 date: 2025-12-14
 slug: making-this
+description: "How I made my personal site, more or less"
+tags: [design, web]
 ---
 
 I decided I need a personal website now, so here's how I made this one, sort of. This is mainly just a reflection on some of the design decisions I made, and a post to test blog posts as I'm making the site. 

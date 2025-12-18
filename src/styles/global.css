@@ -1,3 +1,5 @@
+
+
 :root {
 	--color-bg: #fdfdfd;
 	--color-surface: #ffffff;
@@ -8,16 +10,46 @@
 	--font-sans: var(--font-manrope), sans-serif, -apple-system, system-ui;
 	--font-title: var(--font-switzer), -apple-system, sans-serif,system-ui;
 	--font-mono: var(--font-ibmplexmono), monospace;
+	scroll-behavior: smooth;
+
 }
 
 * {
 	box-sizing: border-box;
+	scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
 }
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-left: 1px solid var(--color-border);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    border-color: var(--color-text);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: var(--color--muted);
+}
+
+
 html {
   height: 100%;
   background: var(--color-bg);
   background-color: var(--color-bg);
-	overscroll-behavior: none;
+  overscroll-behavior: none;
+  width: 100%;
 }
 
 body {
@@ -33,6 +65,8 @@ body {
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	overscroll-behavior: none;
+	width: 100%;
+
 }
 
 h1,
