@@ -155,14 +155,31 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
       <a href="https://hackclub.enterprise.slack.com/team/U066HP9DWPK">[slack]</a>
       </div>
       </section>
-      <section class="lucky">
-      <a href="https://finnh.ca"><img src="/88x31.gif" alt="finnh.ca 88x31" width="88" height="31" /></a>
+      <section class="lucky" id="lucky">
+        <a href="#lucky" onclick="navigator.clipboard.writeText('https://finnh.ca/88x31.gif')">
+          <img src="/88x31.gif" alt="finnh.ca 88x31" width="88" height="31" />
+        </a>
+        <div class="buttons">
+          <img src="/buttons/aseprite.png" alt="Aseprite" width="88" height="31" />
+          <img src="/buttons/astro.png" alt="Astro" width="88" height="31" />
+          <img src="/buttons/ditheringnow.png" alt="Dithering Now" width="88" height="31" />
+          <img src="/buttons/hackclub.png" alt="Hack Club" width="88" height="31" />
+          <img src="/buttons/internetarchive.gif" alt="Internet Archive" width="88" height="31" />
+          <img src="/buttons/kglw.png" alt="KGLW" width="88" height="31" />
+          <img src="/buttons/kicad.png" alt="KiCad" width="88" height="31" />
+          <img src="/buttons/neovim.png" alt="Neovim" width="88" height="31" />
+          <img src="/buttons/testedonfirefox.png" alt="Tested on Firefox" width="88" height="31" />
+          <img src="/buttons/vscode.png" alt="VS Code" width="88" height="31" />
+          <img src="/buttons/typst.png" alt="Typst" width="88" height="31" />
+        </div>
+        <pagering-link theme="light"></pagering-link>
       </section>
     </div>
     <footer class="footer"> 
       <p>© Finn Hofbauer, 2025</p> <a href="/">commit {commitHash}, github</a>
     </footer>
     </main>
+    <script src="https://pagering.gideon.sh/embed.js" defer></script>
   </body>
 </html>
 
@@ -189,6 +206,14 @@ main {
   text-shadow: -1px -1px 0 var(--color-text-muted), 1px -1px 0 var(--color-text-muted), -1px 1px 0 var(--color-text-muted), 1px 1px 0 var(--color-text-muted);
 }
 
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  width: 100%;
+}
+
 section.block {
   margin: 0 75px;
 }
@@ -207,6 +232,8 @@ section.block {
   width: 100%;
   display: flex;
   flex: 1;
+  flex-direction: column;
+  gap: 15px;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
