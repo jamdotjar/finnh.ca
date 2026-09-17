@@ -191,6 +191,10 @@ const random = Array.from(title + date.toString()).reduce((acc, char) => acc + c
     }
 
     @media (max-width: 800px) {
+        nav { position: static; padding: 1rem 1rem 0; }
+        nav a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; }
+        header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .meta { flex-wrap: wrap; }
         article {
             padding: 1.5rem 1rem;
         }
