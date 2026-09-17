@@ -98,7 +98,8 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
         <ul class="project-grid"> 
           {projects.map((project) => (
             <li>
-              <article onclick={`window.open('${project.link}', '_blank')`}>
+              <a href={project.link} target="_blank" rel="noopener noreferrer">
+              <article>
                 <div class="dithimg">
                   <Image src={project.image} alt={project.title} width={800}/>
                   <AsDithered src={project.image.src} alt={project.title}/>
@@ -110,6 +111,7 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
                 </h2> 
                 <p>{project.description}</p>
               </article>
+              </a>
             </li>
           ))}
 
@@ -522,7 +524,8 @@ main {
   transition: background-position 0.2s ease-in-out;
   image-rendering: pixelated;
 }
-.more-projects > a { flex: 1; }
+.project-grid > li > a { display: block; height: 100%; flex: 1; }
+.project-grid > li > a:focus-visible { outline: 2px solid var(--color-text); outline-offset: 4px; }
 .more-projects-content:hover {
 background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url('/grad-dith.png'); 
 }
@@ -649,6 +652,7 @@ background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)
   .writing, .contact { gap: 24px; }
   .post-info { flex-wrap: wrap; gap: 8px 24px; opacity: 1; }
   .post-title { flex-basis: 100%; }
+  .post-date { color: var(--color-text-muted); }
   .post-blurb { white-space: normal; flex-basis: 100%; }
   .post-tags { flex-wrap: wrap; }
   .post-tags a { width: auto; }
@@ -658,6 +662,8 @@ background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)
 }
 
 @media (max-width: 600px) {
+  main { --seperator-h: 40px; }
+  .writing { min-height: 0; }
   .hero { flex-direction: column; gap: 24px; }
   .menubar nav a { gap: 5px; }
   .hero-text { min-height: 0; gap: 24px; font-size: 1.125rem; }
@@ -666,6 +672,14 @@ background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)
   .projects aside { flex-direction: column; gap: 12px; }
   .contact .section-header { flex-direction: column; align-items: flex-start; }
   .footer { flex-wrap: wrap; gap: 8px; padding: 20px var(--gutter); }
+}
+
+@media (max-width: 1100px), (hover: none) and (pointer: coarse) {
+  .menubar a, .contact-links a, .post-title {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 @keyframes fontWave {
