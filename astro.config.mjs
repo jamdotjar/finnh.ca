@@ -25,8 +25,24 @@ export default defineConfig({
                 name: "IBM Plex Mono",
                 cssVariable: "--font-ibmplexmono",
                 provider: fontProviders.google(),
-            }
-
+            },
+            {
+                name: "Ticketing",
+                cssVariable: "--font-ticketing",
+                provider: "local",
+                variants: [
+                    { src: ["./src/assets/fonts/Ticketing.ttf"], weight: 400, style: "normal", display: "swap" },
+                ],
+            },
+            {
+                name: "Alte Haas Grotesk",
+                cssVariable: "--font-altehaasgrotesk",
+                provider: "local",
+                variants: [
+                    { src: ["./src/assets/fonts/AlteHaasGroteskRegular.ttf"], weight: 400, style: "normal", display: "swap" },
+                    { src: ["./src/assets/fonts/AlteHaasGroteskBold.ttf"], weight: 700, style: "normal", display: "swap" },
+                ],
+            },
         ]
     }
 });
