@@ -1,7 +1,4 @@
 ---
-// Welcome to Astro! Everything between these triple-dash code fences
-// is your "component frontmatter". It never runs in the browser.
-console.log('This runs in your terminal, not the browser!');
 import { Image } from 'astro:assets';
 import '../styles/global.css';
 
@@ -72,11 +69,8 @@ const projects = [
 
 const posts = await getCollection('blog');
 const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-
-
 ---
-<Layout title="finnh.ca" description="My corner of the internet that `I rent for  $13.47/year ">
+<Layout title="finnh.ca" description="My corner of the internet that I rent for  $13.47/year ">
 <html>
       <Head/>
   <body>
@@ -84,8 +78,8 @@ const sortedPosts = posts.sort((a, b) => b.data.date.getTime() - a.data.date.get
     <main>
     <section class="hero block">
       <div class="hero-text">
-      <h1><i>Hey, it's Finn</i></h1>
-      <p>I'm a massive ▓▓▓▓ nerd from Canada and I make things for fun and financial ruin. Check out some of my projects below, read my ramblings, and if you want get in touch!</p>
+      <h1 style="font-family: var(--font-ticketing);"><i>Hey, it's Finn</i></h1>
+      <p>I'm a nerd from Canada, who makes things for fun and financial ruin. Check out some of my projects below, read my ramblings, and if you want get in touch!</p>
       </div>
       <div class="hero-media"><Image class="hero-img" src={import('../assets/hero-dith.png')} alt="AAAAAA"/></div>
     </section>
@@ -588,7 +582,7 @@ background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)
   backdrop-filter: blur(10px);
   text-align: center;
   z-index: 10;
-  font-family: var(--font-title);
+  font-family: var(--font-altehaasgrotesk, --font-sans, sans-serif);
 }
 .menubar nav {
   display: flex;
@@ -599,7 +593,7 @@ background-image: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  font-family: var(--font-title);
+  font-family: var(--font-altehaasgrotesk, --font-sans, sans-serif);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
